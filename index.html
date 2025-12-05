@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Budget Manager</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <h1>Budget Manager</h1>
+    </div>
+    <div class="header-right">
+      <button id="themeToggle" class="theme-toggle">🌙 Dark</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Quick stats -->
+    <section class="card stats-card">
+      <div class="stat-chip">
+        <div class="stat-label">This month income</div>
+        <div class="stat-value" id="statIncome">₹0</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-label">This month expenses</div>
+        <div class="stat-value" id="statExpenses">₹0</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-label">Net this month</div>
+        <div class="stat-value" id="statNet">₹0</div>
+      </div>
+    </section>
+
+    <!-- Charts row (donut charts) -->
+    <div class="charts-row">
+      <!-- Monthly Expenses Donut Chart -->
+      <section class="card chart-card">
+        <h2>This Month's Expenses</h2>
+        <canvas id="expensesChart" width="320" height="320"></canvas>
+        <div class="small" id="chartNote"></div>
+      </section>
+
+      <!-- Subscriptions Donut Chart -->
+      <section class="card chart-card">
+        <h2>Subscriptions</h2>
+        <canvas id="subsChart" width="320" height="320"></canvas>
+        <div class="small" id="subsChartNote"></div>
+      </section>
+    </div>
+
+    <!-- Balance Over Time Line Chart -->
+    <section class="card line-chart-card">
+      <div class="line-chart-header">
+        <h2>Balance Over Time</h2>
+        <div class="chart-controls">
+          <div class="range-toggle">
+            <button class="range-btn active" data-range="all">All</button>
+            <button class="range-btn" data-range="30">30 days</button>
+            <button class="range-btn" data-range="7">7 days</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="line-chart-body">
+        <canvas id="balanceChart" width="600" height="260"></canvas>
+        <div id="balanceTooltip" class="chart-tooltip"></div>
+      </div>
+
+      <div class="small" id="balanceChartNote"></div>
+
+      <div class="goals-section">
+        <h3>Goals</h3>
+        <div class="row goals-row">
+          <input id="goalLabel" type="text" placeholder="Goal name (e.g. Emergency Fund)" />
+          <input id="goalValue" type="number" placeholder="Amount (₹)" />
+          <input id="goalColor" type="color" value="#10b981" />
+          <button id="addGoalBtn">Add Goal</button>
+        </div>
+        <div id="goalList" class="goal-list"></div>
+      </div>
+    </section>
+
+    <!-- Balance -->
+    <section class="card balance-card">
+      <h2>Balance</h2>
+      <div class="balance-display">₹<span id="balance">0</span></div>
+    </section>
+
+    <!-- Update Balance -->
+    <section class="card form-card">
+      <h3>Update Balance</h3>
+      <div class="row">
+        <input id="updateBalanceInput" type="number" placeholder="New Balance (₹)" />
+        <button id="updateBalanceBtn">Update</button>
+      </div>
+    </section>
+
+    <!-- Add Income -->
+    <section class="card form-card">
+      <h3>Add Income</h3>
+      <div class="row">
+        <input id="incomeInput" type="number" placeholder="Amount (₹)" />
+        <button id="addIncomeBtn">Add</button>
+      </div>
+    </section>
+
+    <!-- Add Expense -->
+    <section class="card form-card">
+      <h3>Add Expense</h3>
+      <input id="expenseName" type="text" placeholder="Expense name" />
+      <div class="row">
+        <select id="expenseCategory">
+          <option value="General">General</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills</option>
+          <option value="Fun">Fun</option>
+          <option value="Other">Other</option>
+        </select>
+        <input id="expenseAmt" type="number" placeholder="Amount (₹)" />
+      </div>
+      <textarea id="expenseNote" placeholder="Note (optional)" rows="2"></textarea>
+      <button id="addExpenseBtn" style="margin-top:8px;">Add Expense</button>
+    </section>
+
+    <!-- Expense Filters -->
+    <section class="card filter-card">
+      <h3>Expense Filters</h3>
+      <div class="row">
+        <select id="filterTime">
+          <option value="all">All time</option>
+          <option value="month">This month</option>
+          <option value="7">Last 7 days</option>
+        </select>
+        <select id="filterCategory">
+          <option value="all">All categories</option>
+          <option value="General">General</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills</option>
+          <option value="Fun">Fun</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Expense List -->
+    <section class="card list-card">
+      <h3>Expenses</h3>
+      <div id="expenseList" class="list"></div>
+    </section>
+
+    <!-- Add Subscription -->
+    <section class="card form-card">
+      <h3>Subscriptions</h3>
+      <input id="subName" type="text" placeholder="Company / Service name" />
+      <div class="row">
+        <input id="subAmt" type="number" placeholder="Monthly Cost (₹)" />
+        <button id="addSubBtn">Add Subscription</button>
+      </div>
+    </section>
+
+    <!-- Subscription List -->
+    <section class="card list-card">
+      <h3>Subscriptions</h3>
+      <div id="subList" class="list"></div>
+    </section>
+
+    <!-- Expense Log (pop-down tab) -->
+    <section class="card">
+      <details>
+        <summary class="log-summary">📜 Expense Log (timeline)</summary>
+        <div class="log-content">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="expenseLogBody"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- Streaks & Achievements -->
+    <section class="card stats-card">
+      <div class="stat-chip">
+        <div class="stat-label">Activity streak</div>
+        <div class="stat-value" id="streakText">0 days</div>
+      </div>
+      <div class="stat-chip achievements-chip">
+        <div class="stat-label">Achievements</div>
+        <div class="stat-value" id="achievementsText">None yet</div>
+      </div>
+    </section>
+
+    <!-- Export / Import -->
+    <section class="card sync-card">
+      <h3>Export / Import</h3>
+      <div class="row">
+        <button id="exportBtn">Export JSON</button>
+        <label class="file-label">
+          Import JSON
+          <input id="importFile" type="file" accept="application/json" />
+        </label>
+      </div>
+      <small class="note">
+        Export downloads <code>budget.json</code>. Import loads your data (balance, history, expenses, subscriptions, goals).
+      </small>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <small>Made with ❤️ — Works offline using localStorage</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
